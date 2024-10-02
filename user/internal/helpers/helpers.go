@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -29,7 +30,7 @@ func VerifyPassword(providedpassword, userpassword string) (bool, error) {
 }
 
 type SignedDetails struct {
-	id int
+	Id string
 	jwt.StandardClaims
 }
 
@@ -39,7 +40,7 @@ func GenerateAccessToken(id int) (string, error) {
 		return "", errors.New("access token secret is not set")
 	}
 	accessClaims := &SignedDetails{
-		id: id,
+		Id: strconv.Itoa(id),
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},

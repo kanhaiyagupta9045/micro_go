@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/kanhaiyagupta9045/pratilipi/user/internal/handler"
+	"github.com/kanhaiyagupta9045/product_service/internal/handlers"
 )
 
-func Router(handler *handler.UserHandler) *gin.Engine {
+func ProductRoutes(handler *handlers.ProductHandler) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
@@ -20,12 +20,6 @@ func Router(handler *handler.UserHandler) *gin.Engine {
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "pong")
 	})
-	router.POST("/user/register", handler.RegisterUser())
-	router.GET("/list/users", handler.ListAllUser())
-	router.GET("/user/:id", handler.GetUserByID())
-
-	router.GET("/validate/user", handler.ValidateToken())
-	router.POST("/user/login", handler.Login())
-
+	router.POST("/create/product", handler.CreateProduct())
 	return router
 }

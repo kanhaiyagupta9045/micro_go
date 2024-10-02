@@ -1,12 +1,12 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/kanhaiyagupta9045/pratilipi/user/internal/authentication"
 	"github.com/kanhaiyagupta9045/pratilipi/user/internal/helpers"
 	"github.com/kanhaiyagupta9045/pratilipi/user/internal/model"
 	"github.com/kanhaiyagupta9045/pratilipi/user/internal/service"
@@ -113,15 +113,20 @@ func (u *UserHandler) Login() gin.HandlerFunc {
 	}
 }
 
-func (u *UserHandler) Middlerware() gin.HandlerFunc {
+func (u *UserHandler) ValidateToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		claims, err := authentication.Authenticate(c)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		token := c.Request.Header.Get("Authorization")
+		if token == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Please provide token for validating the users"})
 			return
 		}
 
+		claims, err := helpers.ValidateToken(token)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error:": err.Error()})
+			return
+		}
 		userID, err := strconv.ParseUint(claims.Id, 10, 32)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format"})
@@ -129,15 +134,19 @@ func (u *UserHandler) Middlerware() gin.HandlerFunc {
 		}
 
 		user, err := u.service.GetUserByID(uint(userID))
-
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 			return
 		} else if err != nil {
+			fmt.Println(err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
-		c.Set("user", user)
-		c.Next()
+
+		if user.UserType != "ADMIN" {
+			c.JSON(http.StatusBadRequest, gin.H{"error:": "Invalid User"})
+		}
+		c.JSON(http.StatusOK, "Ok")
+
 	}
 }
