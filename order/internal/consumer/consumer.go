@@ -30,6 +30,7 @@ func (c *Consumer) Cleanup(session sarama.ConsumerGroupSession) error { return n
 func (c *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	for msg := range claim.Messages() {
 		switch msg.Topic {
+
 		case USER_TOPIC:
 			var event models.UserEvent
 			err := json.Unmarshal(msg.Value, &event)
@@ -50,34 +51,35 @@ func (c *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, claim saram
 			default:
 				log.Printf("Unknown user event type: %s", event.EventType)
 			}
-
 		case PRODUCT_TOPIC:
 
 			var productEvent models.ProductCreatedEvent
-			if err := json.Unmarshal(msg.Value, &productEvent); err == nil {
-				if productEvent.EventType == "Product Created" {
-					if err := srv.CreateOrder(productEvent.Data); err != nil {
-						log.Printf("Error While Creating product: %s", err.Error())
-					}
+			err := json.Unmarshal(msg.Value, &productEvent)
+			if err == nil && productEvent.EventType == "Product Created" {
+				if err := srv.CreateOrder(productEvent.Data); err != nil {
+					log.Printf("Error While Creating product: %s", err.Error())
 				}
-			} else {
+				session.MarkMessage(msg, "")
+				continue
+			}
 
-				var inventoryEvent models.InventoryUpdate
-				err := json.Unmarshal(msg.Value, &inventoryEvent)
-				if err != nil {
-					log.Printf("Error unmarshalling message from PRODUCT_TOPIC: %v", err)
-					continue
-				}
-				if inventoryEvent.EventType == "Inventory Updated" {
-					if err := srv.UpdateInventory(inventoryEvent.ProductID, inventoryEvent.StockLevel); err != nil {
-						log.Printf("Error While Updating Inventory: %s", err.Error())
-					}
+			var inventoryEvent models.InventoryUpdate
+			err = json.Unmarshal(msg.Value, &inventoryEvent)
+			if err != nil {
+				log.Printf("Error unmarshalling message from PRODUCT_TOPIC: %v", err)
+				continue
+			}
+
+			if inventoryEvent.EventType == "Inventory Updated" {
+				if err := srv.UpdateInventory(inventoryEvent.ProductID, inventoryEvent.StockLevel); err != nil {
+					log.Printf("Error While Updating Inventory: %s", err.Error())
 				}
 			}
 
 		default:
 			log.Printf("Unknown topic: %s", msg.Topic)
 		}
+
 		session.MarkMessage(msg, "")
 	}
 	return nil

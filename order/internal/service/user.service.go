@@ -22,7 +22,7 @@ func NewOrderService(repo *repository.OrderRepositry, producer *producer.Produce
 
 func (o *OrderService) CreateUser(eventData models.Data) error {
 
-	user := models.User{
+	user := models.UserCatalog{
 		ID:           eventData.ID,
 		FirstName:    eventData.FirstName,
 		LastName:     eventData.LastName,
@@ -52,7 +52,7 @@ func (o *OrderService) UpdateUser(eventData models.Data) error {
 	return nil
 }
 
-func (o *OrderService) GetUserById(id int) (*models.User, error) {
+func (o *OrderService) GetUserById(id int) (*models.UserCatalog, error) {
 
 	return o.repo.GetUserById(id)
 }

@@ -56,7 +56,7 @@ func main() {
 			log.Fatalf("ListenAndServe error: %v", err)
 		}
 	}()
-	log.Println("Server started on port", os.Getenv("ADDR"))
+	log.Printf("Server started on port %s", os.Getenv("PORT"))
 	<-stop
 
 	log.Println("Shutting down the server...")

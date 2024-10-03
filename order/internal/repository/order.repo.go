@@ -26,19 +26,16 @@ func (o *OrderRepositry) PlaceOrder(customerID, productID int, orderItem models.
 	})
 }
 
-func (o *OrderRepositry) OrderbyID(order_id int) (*models.Order, error) {
+func (o *OrderRepositry) GetOrderById(orderID int) (*models.Order, error) {
 	var order models.Order
-	if err := o.db.Where("order_id = ?", order_id).First(&order).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("order not found")
-		}
+	if err := o.db.Preload("OrderItem").First(&order, orderID).Error; err != nil {
 		return nil, err
 	}
 	return &order, nil
 }
 
 func (o *OrderRepositry) ShipOrder(order_id int) error {
-	order, err := o.OrderbyID(order_id)
+	order, err := o.GetOrderById(order_id)
 	if err != nil {
 		return err
 	}

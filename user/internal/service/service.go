@@ -26,13 +26,20 @@ func (s *UserService) CreateUser(user *model.User) error {
 		return err
 	}
 
+	modifedAddress := model.ModifiedAddress{
+		Village:  user.Address.Village,
+		City:     user.Address.City,
+		District: user.Address.District,
+		State:    user.Address.State,
+	}
+
 	data := model.Data{
 		ID:           user.ID,
 		FirstName:    user.FirstName,
 		LastName:     user.LastName,
 		MobileNumber: user.MobileNumber,
 		Email:        user.Email,
-		Address:      user.Address,
+		Address:      modifedAddress,
 	}
 	event := model.UserEvent{
 		EventType: "User Registered",

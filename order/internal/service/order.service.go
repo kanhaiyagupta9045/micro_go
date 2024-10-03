@@ -25,7 +25,7 @@ func (o *OrderService) PlaceOrder(customer_id int, product_id int, orderItem mod
 }
 
 func (o *OrderService) GetOrderByID(order_id int) (*models.Order, error) {
-	return o.repo.OrderbyID(order_id)
+	return o.repo.GetOrderById(order_id)
 }
 
 func (o *OrderService) ShipOrder(order_id int) error {

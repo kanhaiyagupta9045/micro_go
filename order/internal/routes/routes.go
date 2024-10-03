@@ -23,7 +23,7 @@ func OrderRoutes(handler *handlers.OrderHandler) *gin.Engine {
 
 	router.POST("/create/order", handler.PlaceOrder())
 	router.POST("/order/:id", handler.OrderbyID())
-	router.POST("/ship/order", handler.ShipOrder())
+	router.POST("/ship/order/:id", handler.ShipOrder())
 
 	return router
 }

@@ -7,7 +7,7 @@ type Address struct {
 	State    string `gorm:"type:varchar(255);not null" json:"state"`
 }
 
-type User struct {
+type UserCatalog struct {
 	ID           uint    `gorm:"primaryKey;autoIncrement" json:"id"`
 	FirstName    string  `gorm:"type:varchar(255);not null" json:"first_name"`
 	LastName     string  `gorm:"type:varchar(255);not null" json:"last_name"`

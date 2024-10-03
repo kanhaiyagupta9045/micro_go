@@ -85,10 +85,13 @@ func (p *ProductRepositry) UpdateInventory(productID uint, newStock int) error {
 
 func (p *ProductRepositry) UpdateInventoryEvent(product *models.Product) error {
 
+	if err := p.db.Preload("Inventory").First(&product, product.ProductID).Error; err != nil {
+		return err
+	}
+
 	err := p.db.Transaction(func(tx *gorm.DB) error {
 		product.Inventory.StockLevel -= 1
-
-		if err := tx.Save(&product).Error; err != nil {
+		if err := tx.Save(&product.Inventory).Error; err != nil {
 			return err
 		}
 		return nil

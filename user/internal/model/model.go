@@ -26,12 +26,18 @@ type LoginData struct {
 }
 
 type Data struct {
-	ID           uint    `json:"id"`
-	FirstName    string  `json:"first_name"`
-	LastName     string  `json:"last_name"`
-	MobileNumber string  `json:"mobile_number"`
-	Email        string  `json:"email"`
-	Address      Address `json:"address"`
+	ID           uint            `json:"id"`
+	FirstName    string          `json:"first_name"`
+	LastName     string          `json:"last_name"`
+	MobileNumber string          `json:"mobile_number"`
+	Email        string          `json:"email"`
+	Address      ModifiedAddress `json:"address"`
+}
+type ModifiedAddress struct {
+	Village  string `json:"village"`
+	City     string `json:"city"`
+	District string `json:"district"`
+	State    string `json:"state"`
 }
 
 type UserEvent struct {

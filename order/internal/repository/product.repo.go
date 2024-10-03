@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (o *OrderRepositry) CreateOrder(product *models.Product) error {
+func (o *OrderRepositry) CreateOrder(product *models.ProductCatalog) error {
 	if err := o.db.Create(&product).Error; err != nil {
 		return err
 	}
@@ -17,7 +17,7 @@ func (o *OrderRepositry) CreateOrder(product *models.Product) error {
 
 func (o *OrderRepositry) UpdateInventory(productID uint, newStock int) error {
 	err := o.db.Transaction(func(tx *gorm.DB) error {
-		var inventory models.Inventory
+		var inventory models.InventoryCatalog
 
 		if err := tx.Where("product_id = ?", productID).First(&inventory).Error; err != nil {
 
@@ -39,8 +39,8 @@ func (o *OrderRepositry) UpdateInventory(productID uint, newStock int) error {
 	return err
 }
 
-func (p *OrderRepositry) GetProductById(product_id int) (*models.Product, error) {
-	var product *models.Product
+func (p *OrderRepositry) GetProductById(product_id int) (*models.ProductCatalog, error) {
+	var product *models.ProductCatalog
 	if err := p.db.Preload("Inventory").Where("product_id = ?", product_id).First(&product).Error; err != nil {
 		return nil, err
 	}

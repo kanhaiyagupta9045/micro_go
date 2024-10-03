@@ -18,7 +18,7 @@ func NewOrderRepositry(connectionstring string) (*OrderRepositry, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := DB.AutoMigrate(&models.User{}, &models.Product{}, &models.Inventory{}); err != nil {
+	if err := DB.AutoMigrate(&models.UserCatalog{}, &models.ProductCatalog{}, &models.InventoryCatalog{}, &models.Order{}, &models.OrderItem{}); err != nil {
 		return nil, err
 	}
 
@@ -27,7 +27,7 @@ func NewOrderRepositry(connectionstring string) (*OrderRepositry, error) {
 	}, nil
 }
 
-func (o *OrderRepositry) CreateUser(user *models.User) error {
+func (o *OrderRepositry) CreateUser(user *models.UserCatalog) error {
 	if err := o.db.Create(&user).Error; err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (o *OrderRepositry) CreateUser(user *models.User) error {
 }
 
 func (o *OrderRepositry) UpdateUser(id int, eventData models.Data) error {
-	var existinguser models.User
+	var existinguser models.UserCatalog
 	if err := o.db.Where("id = ?", id).First(&existinguser).Error; err != nil {
 		return err
 	}
@@ -73,8 +73,8 @@ func (o *OrderRepositry) UpdateUser(id int, eventData models.Data) error {
 
 }
 
-func (o *OrderRepositry) GetUserById(id int) (*models.User, error) {
-	var user models.User
+func (o *OrderRepositry) GetUserById(id int) (*models.UserCatalog, error) {
+	var user models.UserCatalog
 	if err := o.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}

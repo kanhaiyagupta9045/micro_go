@@ -19,19 +19,19 @@ import (
 )
 
 func init() {
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load("/app/.env"); err != nil {
 		panic(err)
 	}
 }
 
 func main() {
-	repo, err := repository.NewUserRepository(os.Getenv("DATABASE_URL"))
+	repo, err := repository.NewUserRepository(os.Getenv("DOCKER_POSTRES_URL"))
 
 	if err != nil {
 		panic(err.Error())
 	}
 
-	kafkaproducer, err := kafka.NewProducer([]string{"localhost:9092"})
+	kafkaproducer, err := kafka.NewProducer([]string{"kafka:29092"})
 	if err != nil {
 		log.Fatalf("Failed to create Kafka producer: %v", err)
 		return
@@ -53,7 +53,7 @@ func main() {
 			log.Fatalf("ListenAndServe error: %v", err)
 		}
 	}()
-	log.Println("Server started on port", os.Getenv("ADDR"))
+	log.Printf("Server started on port %s", os.Getenv("ADDR"))
 	<-stop
 
 	log.Println("Shutting down the server...")

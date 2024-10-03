@@ -20,7 +20,7 @@ import (
 )
 
 func init() {
-	if err := godotenv.Load("../.env"); err != nil {
+	if err := godotenv.Load("/app/.env"); err != nil {
 		panic(err.Error())
 	}
 }
@@ -55,7 +55,7 @@ func main() {
 			log.Fatalf("ListenAndServe error: %v", err)
 		}
 	}()
-	log.Println("Server started on port", os.Getenv("ADDR"))
+	log.Println("Server started on port", os.Getenv("PORT"))
 	<-stop
 
 	log.Println("Shutting down the server...")
