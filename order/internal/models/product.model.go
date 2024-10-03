@@ -1,8 +1,6 @@
 package models
 
-import (
-	"time"
-)
+import "time"
 
 type Product struct {
 	ProductID   uint      `gorm:"primaryKey;autoIncrement" json:"product_id"`
@@ -25,17 +23,8 @@ type ProductCreatedEvent struct {
 	Data      Product `json:"data"`
 }
 
-type Stock struct {
-	Stock int `json:"updated_stock" validate:"required"`
-}
-
 type InventoryUpdate struct {
 	EventType  string `json:"event_type"`
 	ProductID  int    `gorm:"type:uuid;not null" json:"product_id"`
 	StockLevel int    `gorm:"not null" json:"stock_level"`
-}
-
-type OrderEvent struct {
-	EventType string `json:"event_type"`
-	ProductID int    `json:"product_id"`
 }

@@ -55,7 +55,14 @@ func (u *UserHandler) ListAllUser() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-		c.JSON(http.StatusOK, users)
+
+		var userdata []model.User
+		for _, user := range users {
+			tempuser := user
+			tempuser.Password = ""
+			userdata = append(userdata, tempuser)
+		}
+		c.JSON(http.StatusOK, userdata)
 	}
 }
 
@@ -77,7 +84,7 @@ func (u *UserHandler) GetUserByID() gin.HandlerFunc {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 			return
 		}
-
+		user.Password = ""
 		c.JSON(http.StatusOK, user)
 	}
 }
@@ -148,5 +155,44 @@ func (u *UserHandler) ValidateToken() gin.HandlerFunc {
 		}
 		c.JSON(http.StatusOK, "Ok")
 
+	}
+}
+
+func (u *UserHandler) UpdateProfileData() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.Request.Header.Get("Authorization")
+		if token == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Please provide token for validating the users"})
+			return
+		}
+
+		claims, err := helpers.ValidateToken(token)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error:": err.Error()})
+			return
+		}
+		userID, err := strconv.ParseUint(claims.Id, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format"})
+			return
+		}
+
+		var updateData model.Data
+
+		if err := c.BindJSON(&updateData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if validationErr := validate.Struct(&updateData); validationErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+			return
+		}
+
+		if err := u.service.UpdateProfile(int(userID), &updateData); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"message": "Profile Updated Succesfully"})
 	}
 }

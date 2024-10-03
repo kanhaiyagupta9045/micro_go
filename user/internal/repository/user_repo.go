@@ -84,10 +84,10 @@ func (r *UserRepository) GetUserById(id uint) (*model.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) UpdateUser(user model.UpdateData) error {
+func (r *UserRepository) UpdateUser(id int, user *model.Data) error {
 	var existinguser model.User
 
-	if err := r.db.Where("email = ?", user.Email).First(&existinguser).Error; err != nil {
+	if err := r.db.Where("id = ?", id).First(&existinguser).Error; err != nil {
 		return errors.New("user doesn't exist")
 	}
 
@@ -103,11 +103,25 @@ func (r *UserRepository) UpdateUser(user model.UpdateData) error {
 	if user.FirstName != "" {
 		existinguser.FirstName = user.FirstName
 	}
-
+	if user.Email != "" {
+		existinguser.Email = user.Email
+	}
 	if user.LastName != "" {
 		existinguser.LastName = user.LastName
 	}
 
+	if user.Address.Village != "" {
+		existinguser.Address.Village = user.Address.Village
+	}
+	if user.Address.City != "" {
+		existinguser.Address.City = user.Address.City
+	}
+	if user.Address.District != "" {
+		existinguser.Address.District = user.Address.District
+	}
+	if user.Address.District != "" {
+		existinguser.Address.State = user.Address.State
+	}
 	res := r.db.Save(&existinguser)
 
 	if res.Error != nil {

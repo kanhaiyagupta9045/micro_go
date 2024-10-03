@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/kanhaiyagupta9045/product_service/internal/handlers"
+	"github.com/kanhaiyagupta9045/pratilipi/order/internal/handlers"
 )
 
-func ProductRoutes(handler *handlers.ProductHandler) *gin.Engine {
+func OrderRoutes(handler *handlers.OrderHandler) *gin.Engine {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
@@ -20,9 +20,10 @@ func ProductRoutes(handler *handlers.ProductHandler) *gin.Engine {
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, "pong")
 	})
-	router.POST("/create/product", handler.CreateProduct())
-	router.GET("/products/list_all_products", handler.ListAllProducts())
-	router.GET("/product/:id", handler.GetProductById())
-	router.PUT("/update/inventory/:id", handler.UpdateInventory())
+
+	router.POST("/create/order", handler.PlaceOrder())
+	router.POST("/order/:id", handler.OrderbyID())
+	router.POST("/ship/order", handler.ShipOrder())
+
 	return router
 }

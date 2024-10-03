@@ -23,9 +23,9 @@ func Router(handler *handler.UserHandler) *gin.Engine {
 	router.POST("/user/register", handler.RegisterUser())
 	router.GET("/list/users", handler.ListAllUser())
 	router.GET("/user/:id", handler.GetUserByID())
-
 	router.GET("/validate/user", handler.ValidateToken())
 	router.POST("/user/login", handler.Login())
+	router.POST("/user/update_profile", handler.UpdateProfileData())
 
 	return router
 }

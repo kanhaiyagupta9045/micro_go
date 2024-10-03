@@ -1,4 +1,4 @@
-package kafka
+package producer
 
 import (
 	"encoding/json"
@@ -6,13 +6,14 @@ import (
 	"github.com/IBM/sarama"
 )
 
+var (
+	Order_Topic   = "user_topic"
+	PRODUCT_TOPIC = "product_topic"
+)
+
 type Producer struct {
 	producer sarama.SyncProducer
 }
-
-var (
-	USER_TOPIC = "user_topic"
-)
 
 func NewProducer(brokers []string) (*Producer, error) {
 	config := sarama.NewConfig()
@@ -40,8 +41,4 @@ func (p *Producer) ProduceMessage(topic string, message interface{}) error {
 
 	_, _, err = p.producer.SendMessage(msg)
 	return err
-}
-
-func (p *Producer) Close() error {
-	return p.producer.Close()
 }

@@ -26,10 +26,26 @@ func (s *UserService) CreateUser(user *model.User) error {
 		return err
 	}
 
-	err := s.kafka.ProduceMessage(kafka.USER_TOPIC, "USER Registered")
-	if err != nil {
-		log.Println(err.Error())
+	data := model.Data{
+		ID:           user.ID,
+		FirstName:    user.FirstName,
+		LastName:     user.LastName,
+		MobileNumber: user.MobileNumber,
+		Email:        user.Email,
+		Address:      user.Address,
 	}
+	event := model.UserEvent{
+		EventType: "User Registered",
+		Data:      data,
+	}
+
+	log.Println("Emitting event:", event)
+	go func() {
+		if err := s.kafka.ProduceMessage(kafka.USER_TOPIC, event); err != nil {
+			log.Println("Error producing Kafka message:", err)
+		}
+
+	}()
 
 	return nil
 }
@@ -69,13 +85,23 @@ func (s *UserService) LoginUser(logindata model.LoginData) (*model.User, error) 
 	return user, nil
 }
 
-func (s *UserService) UpdateProfile(updateddata model.UpdateData) error {
-
-	if err := s.repo.UpdateUser(updateddata); err != nil {
+func (s *UserService) UpdateProfile(id int, updateddata *model.Data) error {
+	updateddata.ID = uint(id)
+	if err := s.repo.UpdateUser(id, updateddata); err != nil {
 		return err
 	}
-	if err := s.kafka.ProduceMessage(kafka.USER_TOPIC, "User Profile Updated"); err != nil {
-		log.Println(err.Error())
+
+	event := model.UserEvent{
+		EventType: "User Profile Updated",
+		Data:      *updateddata,
 	}
+
+	log.Println("Emitting Update User  event:", event)
+	go func() {
+		if err := s.kafka.ProduceMessage(kafka.USER_TOPIC, event); err != nil {
+			log.Println("Error producing Kafka message:", err)
+		}
+
+	}()
 	return nil
 }
